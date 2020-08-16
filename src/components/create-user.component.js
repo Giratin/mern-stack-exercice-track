@@ -9,13 +9,16 @@ export default class CreateUser extends Component {
     this.onSubmit = this.onSubmit.bind(this);
 
     this.state = {
-      username: ''
+      username: '',
+      /*created : undefined*/
     }
   }
 
   onChangeUsername(e) {
     this.setState({
-      username: e.target.value
+      username: e.target.value,
+      showFailAlert : false,
+      showSuccessAlert : false
     })
   }
 
@@ -26,14 +29,12 @@ export default class CreateUser extends Component {
       username: this.state.username
     }
 
-    console.log(user);
-
     axios.post('http://localhost:5000/users/add', user)
-      .then(res => console.log(res.data));
+      .then((res) => {
+        res.data.created ? this.setState({ username: '', showSuccessAlert: true }) : this.setState({ showFailAlert: true })
+        console.log(this.state)
+      });
 
-    this.setState({
-      username: ''
-    })
   }
 
   render() {
@@ -41,15 +42,18 @@ export default class CreateUser extends Component {
       <div>
         <h3>Create New User</h3>
         <form onSubmit={this.onSubmit}>
-          <div className="form-group"> 
+          <div className="form-group">
             <label>Username: </label>
-            <input  type="text"
-                required
-                className="form-control"
-                value={this.state.username}
-                onChange={this.onChangeUsername}
-                />
+            <input type="text"
+              required
+              className="form-control"
+              value={this.state.username}
+              onChange={this.onChangeUsername}
+            />
           </div>
+          {this.state.showSuccessAlert &&  <div className="alert alert-success"> Username added </div> }
+          {this.state.showFailAlert &&  <div className="alert alert-danger"> Username duplicated </div> }
+
           <div className="form-group">
             <input type="submit" value="Create User" className="btn btn-primary" />
           </div>
